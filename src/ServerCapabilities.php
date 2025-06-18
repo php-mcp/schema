@@ -78,13 +78,14 @@ class ServerCapabilities implements JsonSerializable
         }
 
         if ($resourcesEnabled) {
-            $this->resources = [];
+            $resources = [];
             if ($resourcesSubscribe) {
-                $this->resources['subscribe'] = $resourcesSubscribe;
+                $resources['subscribe'] = $resourcesSubscribe;
             }
             if ($resourcesListChanged) {
-                $this->resources['listChanged'] = $resourcesListChanged;
+                $resources['listChanged'] = $resourcesListChanged;
             }
+            $this->resources = $resources;
         } else {
             $this->resources = null;
         }
