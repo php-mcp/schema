@@ -12,129 +12,66 @@ use JsonSerializable;
 class ServerCapabilities implements JsonSerializable
 {
     /**
-     * Present if the server supports sending log messages to the client.
-     */
-    public readonly ?array $logging;
-
-    /**
-     * Present if the server supports argument autocompletion suggestions.
-     */
-    public readonly ?array $completions;
-
-    /**
-     * Present if the server offers any prompt templates.
-     * @var array{ listChanged: bool }|null
-     */
-    public readonly ?array $prompts;
-
-    /**
-     * Present if the server offers any resources.
-     * @var array{ subscribe: bool, listChanged: bool }|null
-     */
-    public readonly ?array $resources;
-
-    /**
-     * Present if the server offers any tools.
-     * @var array{ listChanged: bool }|null
-     */
-    public readonly ?array $tools;
-
-    /**
-     * Experimental, non-standard capabilities that the server supports.
-     */
-    public readonly ?array $experimental;
-
-    /**
-     * @param bool $toolsEnabled  Server supports tools.
-     * @param bool $toolsListChanged  Server supports sending a notification when the list of tools changes.
-     * @param bool $resourcesEnabled  Server supports resources.
-     * @param bool $resourcesSubscribe  Server supports subscribing to changes in the list of resources.
-     * @param bool $resourcesListChanged  Server supports sending a notification when the list of resources changes.
-     * @param bool $promptsEnabled  Server supports prompts.
-     * @param bool $promptsListChanged  Server supports sending a notification when the list of prompts changes.
-     * @param bool $loggingEnabled  Server supports sending log messages to the client.
-     * @param bool $completionsEnabled  Server supports argument autocompletion suggestions.
-     * @param array|null $experimental  Experimental, non-standard capabilities that the server supports.
+     * @param bool|null $tools  Server exposes callable tools.
+     * @param bool|null $toolsListChanged  Server supports list changed notifications for tools.
+     * @param bool|null $resources  Server provides readable resources.
+     * @param bool|null $resourcesSubscribe  Server supports subscribing to changes in the list of resources.
+     * @param bool|null $resourcesListChanged  Server supports list changed notifications for resources.
+     * @param bool|null $prompts  Server provides prompts templates.
+     * @param bool|null $promptsListChanged  Server supports list changed notifications for prompts.
+     * @param bool|null $logging  Server emits structured log messages.
+     * @param bool|null $completions  Server supports argument autocompletion
+     * @param array|null $experimental  Experimental, non-standard features that the server supports.
      */
     public function __construct(
-        public readonly bool $toolsEnabled = true,
-        public readonly bool $toolsListChanged = false,
-        public readonly bool $resourcesEnabled = true,
-        public readonly bool $resourcesSubscribe = false,
-        public readonly bool $resourcesListChanged = false,
-        public readonly bool $promptsEnabled = true,
-        public readonly bool $promptsListChanged = false,
-        public readonly bool $loggingEnabled = false,
-        public readonly bool $completionsEnabled = false,
-        ?array $experimental = null
-    ) {
-        $this->logging = $loggingEnabled ? [] : null;
-        $this->completions = $completionsEnabled ? [] : null;
-
-        if ($promptsEnabled) {
-            $this->prompts = ['listChanged' => $promptsListChanged];
-        } else {
-            $this->prompts = null;
-        }
-
-        if ($resourcesEnabled) {
-            $resources = [];
-            if ($resourcesSubscribe) {
-                $resources['subscribe'] = $resourcesSubscribe;
-            }
-            if ($resourcesListChanged) {
-                $resources['listChanged'] = $resourcesListChanged;
-            }
-            $this->resources = $resources;
-        } else {
-            $this->resources = null;
-        }
-
-        if ($toolsEnabled) {
-            $this->tools = ['listChanged' => $toolsListChanged];
-        } else {
-            $this->tools = null;
-        }
-
-        $this->experimental = $experimental;
-    }
+        public readonly ?bool $tools = true,
+        public readonly ?bool $toolsListChanged = false,
+        public readonly ?bool $resources = true,
+        public readonly ?bool $resourcesSubscribe = false,
+        public readonly ?bool $resourcesListChanged = false,
+        public readonly ?bool $prompts = true,
+        public readonly ?bool $promptsListChanged = false,
+        public readonly ?bool $logging = false,
+        public readonly ?bool $completions = false,
+        public readonly ?array $experimental = null
+    ) {}
 
     /**
      * Create a new ServerCapabilities object.
      *
-     * @param bool $toolsEnabled  Server supports tools.
-     * @param bool $toolsListChanged  Server supports sending a notification when the list of tools changes.
-     * @param bool $resourcesEnabled  Server supports resources.
-     * @param bool $resourcesSubscribe  Server supports subscribing to changes in the list of resources.
-     * @param bool $resourcesListChanged  Server supports sending a notification when the list of resources changes.
-     * @param bool $promptsEnabled  Server supports prompts.
-     * @param bool $promptsListChanged  Server supports sending a notification when the list of prompts changes.
-     * @param bool $loggingEnabled  Server supports sending log messages to the client.
-     * @param bool $completionsEnabled  Server supports argument autocompletion suggestions.
+     * @param bool|null $tools  Server offers tools.
+     * @param bool|null $toolsListChanged  Server supports sending a notification when the list of tools changes.
+     * @param bool|null $resources  Server offers resources.
+     * @param bool|null $resourcesSubscribe  Server supports subscribing to changes in the list of resources.
+     * @param bool|null $resourcesListChanged  Server supports sending a notification when the list of resources changes.
+     * @param bool|null $prompts  Server offers prompts.
+     * @param bool|null $promptsListChanged  Server supports sending a notification when the list of prompts changes.
+     * @param bool|null $logging  Server supports sending log messages to the client.
+     * @param bool|null $completions  Server supports argument autocompletion suggestions.
      * @param array|null $experimental  Experimental, non-standard capabilities that the server supports.
      */
     public static function make(
-        bool $toolsEnabled = true,
-        bool $toolsListChanged = false,
-        bool $resourcesEnabled = true,
-        bool $resourcesSubscribe = false,
-        bool $resourcesListChanged = false,
-        bool $promptsEnabled = true,
-        bool $promptsListChanged = false,
-        bool $loggingEnabled = false,
-        bool $completionsEnabled = false,
+        ?bool $tools = true,
+        ?bool $toolsListChanged = false,
+        ?bool $resources = true,
+        ?bool $resourcesSubscribe = false,
+        ?bool $resourcesListChanged = false,
+        ?bool $prompts = true,
+        ?bool $promptsListChanged = false,
+        ?bool $logging = false,
+        ?bool $completions = false,
         ?array $experimental = null
     ) {
         return new static(
-            $toolsEnabled,
+            $tools,
             $toolsListChanged,
-            $resourcesEnabled,
+            $resources,
             $resourcesSubscribe,
             $resourcesListChanged,
-            $promptsEnabled,
+            $prompts,
             $promptsListChanged,
-            $loggingEnabled,
-            $completionsEnabled,
+            $logging,
+            $completions,
             $experimental
         );
     }
@@ -142,24 +79,42 @@ class ServerCapabilities implements JsonSerializable
     public function toArray(): array
     {
         $data = [];
-        if ($this->logging !== null) {
-            $data['logging'] = (object) $this->logging;
+
+        if ($this->logging) {
+            $data['logging'] = new \stdClass();
         }
-        if ($this->completions !== null) {
-            $data['completions'] = (object) $this->completions;
+        if ($this->completions) {
+            $data['completions'] = new \stdClass();
         }
-        if ($this->prompts !== null) {
-            $data['prompts'] = (object) $this->prompts;
+
+        if ($this->prompts || $this->promptsListChanged) {
+            $data['prompts'] = new \stdClass();
+            if ($this->promptsListChanged) {
+                $data['prompts']->listChanged = $this->promptsListChanged;
+            }
         }
-        if ($this->resources !== null) {
-            $data['resources'] = (object) $this->resources;
+
+        if ($this->resources || $this->resourcesSubscribe || $this->resourcesListChanged) {
+            $data['resources'] = new \stdClass();
+            if ($this->resourcesSubscribe) {
+                $data['resources']->subscribe = $this->resourcesSubscribe;
+            }
+            if ($this->resourcesListChanged) {
+                $data['resources']->listChanged = $this->resourcesListChanged;
+            }
         }
-        if ($this->tools !== null) {
-            $data['tools'] = (object) $this->tools;
+
+        if ($this->tools || $this->toolsListChanged) {
+            $data['tools'] = new \stdClass();
+            if ($this->toolsListChanged) {
+                $data['tools']->listChanged = $this->toolsListChanged;
+            }
         }
-        if ($this->experimental !== null) {
+
+        if ($this->experimental) {
             $data['experimental'] = (object) $this->experimental;
         }
+
         return $data;
     }
 
@@ -167,6 +122,9 @@ class ServerCapabilities implements JsonSerializable
     {
         $loggingEnabled = isset($data['logging']);
         $completionsEnabled = isset($data['completions']);
+        $toolsEnabled = isset($data['tools']);
+        $promptsEnabled = isset($data['prompts']);
+        $resourcesEnabled = isset($data['resources']);
 
         $promptsListChanged = null;
         if (isset($data['prompts'])) {
@@ -203,13 +161,16 @@ class ServerCapabilities implements JsonSerializable
         }
 
         return new static(
-            $loggingEnabled,
-            $completionsEnabled,
-            $promptsListChanged,
-            $resourcesSubscribe,
-            $resourcesListChanged,
-            $toolsListChanged,
-            $data['experimental'] ?? null
+            tools: $toolsEnabled,
+            toolsListChanged: $toolsListChanged,
+            resources: $resourcesEnabled,
+            resourcesSubscribe: $resourcesSubscribe,
+            resourcesListChanged: $resourcesListChanged,
+            prompts: $promptsEnabled,
+            promptsListChanged: $promptsListChanged,
+            logging: $loggingEnabled,
+            completions: $completionsEnabled,
+            experimental: $data['experimental'] ?? null
         );
     }
 

@@ -11,56 +11,44 @@ use JsonSerializable;
  */
 class ClientCapabilities implements JsonSerializable
 {
-    /**
-     * Present if the client supports listing roots.
-     * @var array{ listChanged: bool }|null
-     */
-    public readonly ?array $roots;
-
-    /**
-     *  Present if the client supports sampling from an LLM.
-     */
-    public readonly ?array $sampling;
-
-    /**
-     *  Experimental, non-standard capabilities that the client supports.
-     */
-    public readonly ?array $experimental;
-
     public function __construct(
-        ?bool $rootsListChanged = null,
-        ?bool $sampling = null,
-        ?array $experimental = null
-    ) {
-        $this->roots = ($rootsListChanged !== null) ? ['listChanged' => $rootsListChanged] : null;
-        $this->sampling = ($sampling === true) ? [] : $sampling;
-        $this->experimental = $experimental;
-    }
+        public readonly ?bool $roots = false,
+        public readonly ?bool $rootsListChanged = null,
+        public readonly ?bool $sampling = null,
+        public readonly ?array $experimental = null
+    ) {}
 
-    public static function make(?bool $rootsListChanged = null, ?bool $sampling = null, ?array $experimental = null): static
+    public static function make(?bool $roots = false, ?bool $rootsListChanged = null, ?bool $sampling = null, ?array $experimental = null): static
     {
-        return new static($rootsListChanged, $sampling, $experimental);
+        return new static($roots, $rootsListChanged, $sampling, $experimental);
     }
 
     public function toArray(): array
     {
         $data = [];
-        if ($this->roots !== null) {
-            $data['roots'] = (object) $this->roots;
+        if ($this->roots || $this->rootsListChanged) {
+            $data['roots'] = new \stdClass();
+            if ($this->rootsListChanged) {
+                $data['roots']->listChanged = $this->rootsListChanged;
+            }
         }
-        if ($this->sampling !== null) {
-            $data['sampling'] = (object) $this->sampling;
+
+        if ($this->sampling) {
+            $data['sampling'] = new \stdClass();
         }
-        if ($this->experimental !== null) {
-            $data['experimental'] = $this->experimental;
+
+        if ($this->experimental) {
+            $data['experimental'] = (object) $this->experimental;
         }
+
         return $data;
     }
 
     public static function fromArray(array $data): static
     {
+        $rootsEnabled = isset($data['roots']);
         $rootsListChanged = null;
-        if (isset($data['roots'])) {
+        if ($rootsEnabled) {
             if (is_array($data['roots']) && array_key_exists('listChanged', $data['roots'])) {
                 $rootsListChanged = (bool) $data['roots']['listChanged'];
             } elseif (is_object($data['roots']) && property_exists($data['roots'], 'listChanged')) {
