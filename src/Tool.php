@@ -67,7 +67,9 @@ class Tool implements JsonSerializable
         if (!isset($data['inputSchema']['type']) || $data['inputSchema']['type'] !== 'object') {
             throw new \InvalidArgumentException("Tool inputSchema must be of type 'object'.");
         }
-
+        if (isset($data['inputSchema']['properties']) && is_array($data['inputSchema']['properties']) && empty($data['inputSchema']['properties'])) {
+            $data['inputSchema']['properties'] = new \stdClass();
+        }
 
         return new static(
             name: $data['name'],
