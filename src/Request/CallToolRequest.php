@@ -20,7 +20,7 @@ class CallToolRequest extends Request
     public function __construct(
         string|int $id,
         public readonly string $name,
-        public readonly array $arguments,
+        public readonly \stdClass|array $arguments,
         public readonly ?array $_meta = null
     ) {
         $params = [
