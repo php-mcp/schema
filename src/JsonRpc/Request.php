@@ -42,6 +42,9 @@ class Request extends Message
             throw new \InvalidArgumentException('Invalid or missing "method" for Request.');
         }
         $params = $data['params'] ?? null;
+        if ($params instanceof \stdClass) {
+            $params = (array) $params;
+        }
         if ($params !== null && !is_array($params)) {
             throw new \InvalidArgumentException('"params" for Request must be an array/object or null.');
         }
