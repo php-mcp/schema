@@ -52,17 +52,27 @@ class CallToolRequest extends Request
             throw new \InvalidArgumentException('Request is not a call tool request');
         }
 
-        $params = $request->params;
+        $params = $request->params ?? [];
 
-        if (! isset($params['name']) || ! is_string($params['name'])) {
+        if (!isset($params['name']) || !is_string($params['name'])) {
             throw new \InvalidArgumentException("Missing or invalid 'name' parameter for tools/call.");
         }
 
-        $arguments = $params['arguments'] ?? new \stdClass();
-        if (! is_array($arguments) && ! $arguments instanceof \stdClass) {
-            throw new \InvalidArgumentException("Parameter 'arguments' must be an object/array for tools/call.");
+        $arguments = $params['arguments'] ?? [];
+
+        if ($arguments instanceof \stdClass) {
+            $arguments = (array) $arguments;
         }
 
-        return new static($request->id, $params['name'], $arguments, $params['_meta'] ?? null);
+        if (!is_array($arguments)) {
+            throw new \InvalidArgumentException("Parameter 'arguments' must be an array.");
+        }
+
+        return new static(
+            $request->id,
+            $params['name'],
+            $arguments,
+            $params['_meta'] ?? null
+        );
     }
 }
