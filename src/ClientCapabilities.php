@@ -28,7 +28,7 @@ class ClientCapabilities implements JsonSerializable
         $data = [];
         if ($this->roots || $this->rootsListChanged) {
             $data['roots'] = new \stdClass();
-            if ($this->rootsListChanged) {
+            if ($this->rootsListChanged !== null) {
                 $data['roots']->listChanged = $this->rootsListChanged;
             }
         }
