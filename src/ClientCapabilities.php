@@ -62,6 +62,7 @@ class ClientCapabilities implements JsonSerializable
         }
 
         return new static(
+            $rootsEnabled,
             $rootsListChanged,
             $sampling,
             $data['experimental'] ?? null
